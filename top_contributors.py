@@ -8,18 +8,41 @@ import argparse
 import time
 import os
 
+def print_top_involved(involved_counts_by_contributor: dict, repo: str = None):
+    if repo is not None:
+        print("Top 10 involved contributors since {} in the {} repo:".format(since, repo))
+    else:
+        print("Top 10 involved contributors since {}:".format(since))
+
+    print("Rank\tContributor\tNumber of PRs involved")
+    sorted_involved_counts = sorted(involved_counts_by_contributor.items(), key=lambda x: x[1], reverse=True)[:10]
+    max_len_contributor = max(len(contributor) for contributor, _ in sorted_involved_counts)
+    for i, (contributor, count) in enumerate(sorted_involved_counts, start=1):
+        print(f"{i}\t{contributor.ljust(max_len_contributor)}\t{count}")
+    print()
+
 def print_top_contributors(contribution_counts_by_contributor: dict, repo: str = None):
     if repo is not None:
         print("Top 10 contributors since {} in the {} repo:".format(since, repo))
     else:
-        print("Top 10 contributors code since {}:".format(since))
+        print("Top 10 contributors since {}:".format(since))
 
-    print("Rank\Contributor\Contribution Count")
+    print("Rank\tContributor\tContribution Count")
     sorted_contribution_counts = sorted(contribution_counts_by_contributor.items(), key=lambda x: x[1], reverse=True)[:10]
     max_len_contributor = max(len(contributor) for contributor, _ in sorted_contribution_counts)
     for i, (contributor, count) in enumerate(sorted_contribution_counts, start=1):
         print(f"{i}\t{contributor.ljust(max_len_contributor)}\t{count}")
     print()
+
+def get_involved_counts_by_contributor(contributors: list) -> dict:
+    dict = {}
+    for contributor_name in [c.login for c in contributors]:
+        search_result = api.search.issues_and_pull_requests(
+            q=f"repo:{owner}/{repo} is:merged involves:{contributor_name} -author:{contributor_name} created:>{since}"
+        )
+        dict[contributor_name] = search_result.total_count
+        time.sleep(2) # Slow down to avoid rate limiting errors.
+    return dict
 
 def get_contribution_counts_by_contributor(contributors: list) -> dict:
     dict = {}
@@ -45,11 +68,19 @@ since = args.since
 api = GhApi(token=os.getenv("GITHUB_ACCESS_TOKEN"))
 
 total_countribution_counts_by_contributor = defaultdict(int)
+total_involved_counts_by_contributor = defaultdict(int)
 
 for repo in repos:
     contributors = get_contributors(api=api, owner=owner, repo=repo, min_contributions=min_contributions)
+
     contribution_counts_by_contributor = get_contribution_counts_by_contributor(contributors=contributors)
+    involved_counts_by_contributor = get_involved_counts_by_contributor(contributors=contributors)
+
     total_countribution_counts_by_contributor = shared.merge_dicts(total_countribution_counts_by_contributor, contribution_counts_by_contributor)
+    total_involved_counts_by_contributor = shared.merge_dicts(total_involved_counts_by_contributor, involved_counts_by_contributor)
+
     print_top_contributors(contribution_counts_by_contributor=contribution_counts_by_contributor, repo=repo)
+    print_top_involved(involved_counts_by_contributor=involved_counts_by_contributor, repo=repo)
 
 print_top_contributors(contribution_counts_by_contributor=total_countribution_counts_by_contributor)
+print_top_involved(involved_counts_by_contributor=total_involved_counts_by_contributor)
