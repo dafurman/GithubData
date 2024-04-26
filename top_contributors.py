@@ -37,6 +37,7 @@ def print_top_contributors(contribution_counts_by_contributor: dict, repo: str =
 def get_involved_counts_by_contributor(contributors: list) -> dict:
     dict = {}
     for contributor_name in [c.login for c in contributors]:
+        print(f"Getting involved counts for {contributor_name}")
         search_result = api.search.issues_and_pull_requests(
             q=f"repo:{owner}/{repo} is:merged involves:{contributor_name} -author:{contributor_name} created:>{since}"
         )
@@ -47,6 +48,7 @@ def get_involved_counts_by_contributor(contributors: list) -> dict:
 def get_contribution_counts_by_contributor(contributors: list) -> dict:
     dict = {}
     for contributor_name in [c.login for c in contributors]:
+        print(f"Getting contribution counts for {contributor_name}")
         search_result = api.search.issues_and_pull_requests(
             q=f"repo:{owner}/{repo} is:merged author:{contributor_name} created:>{since}"
         )
@@ -71,9 +73,14 @@ total_countribution_counts_by_contributor = defaultdict(int)
 total_involved_counts_by_contributor = defaultdict(int)
 
 for repo in repos:
+    print(f"Examining repo {repo}...")
+    print("Getting contributors...")
     contributors = get_contributors(api=api, owner=owner, repo=repo, min_contributions=min_contributions)
 
+    print("Getting contribution counts...")
     contribution_counts_by_contributor = get_contribution_counts_by_contributor(contributors=contributors)
+
+    print("Getting involved counts...")
     involved_counts_by_contributor = get_involved_counts_by_contributor(contributors=contributors)
 
     total_countribution_counts_by_contributor = shared.merge_dicts(total_countribution_counts_by_contributor, contribution_counts_by_contributor)

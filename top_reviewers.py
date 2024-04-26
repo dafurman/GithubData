@@ -24,6 +24,7 @@ def print_top_reviewers(review_counts_by_reviewer: dict, repo: str = None):
 def get_review_counts_by_reviewer(contributors: list) -> dict:
     dict = {}
     for reviewer_name in [c.login for c in contributors]:
+        print(f"Getting review counts for {reviewer_name}")
         if reviewer_name == author:
             continue
 
@@ -52,7 +53,10 @@ api = GhApi(token=os.getenv("GITHUB_ACCESS_TOKEN"))
 total_review_counts_by_reviewer = defaultdict(int)
 
 for repo in repos:
+    print(f"Examining repo {repo}...")
+    print("Getting contributors...")
     contributors = get_contributors(api=api, owner=owner, repo=repo, min_contributions=min_contributions)
+    print("Getting review counts...")
     review_counts_by_reviewer = get_review_counts_by_reviewer(contributors=contributors)
     total_review_counts_by_reviewer = shared.merge_dicts(total_review_counts_by_reviewer, review_counts_by_reviewer)
     print_top_reviewers(review_counts_by_reviewer=review_counts_by_reviewer, repo=repo)
