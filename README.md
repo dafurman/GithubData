@@ -1,6 +1,7 @@
 ## Setup
 
-Make `GITHUB_ACCESS_TOKEN` accessible in your environment.
+1. Make `GITHUB_ACCESS_TOKEN` accessible in your environment.
+2. `pip3 install ghapi`
 
 # Commands
 
