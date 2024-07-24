@@ -11,10 +11,18 @@ This prints a top 10 list of contributors, as well as a separate top 10 list of 
 ```sh
 ./top_contributors.py --repos <repo_a,repo_b,repo_c> <owner>
 ```
+Or to include a "since" date:
+```sh
+./top_contributors.py --repos <repo_a,repo_b,repo_c> <owner> <yyyy-mm-dd>
+```
 
 ## Top Reviewers
 This prints a top 10 list of reviewers, given a github owner and list of repos to examine.
 
 ```sh
-./top_reviewers.py --repos <repo_a,repo_b,repo_c> <owner>
+./top_reviewers.py --repos <repo_a,repo_b,repo_c> <owner> <yyyy-mm-dd>
+```
+Or to include a "since" date:
+```sh
+./top_reviewers.py --repos <repo_a,repo_b,repo_c> <owner> <yyyy-mm-dd>
 ```
