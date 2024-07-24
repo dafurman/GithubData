@@ -20,7 +20,7 @@ Or to include a "since" date:
 This prints a top 10 list of reviewers, given a github owner and list of repos to examine.
 
 ```sh
-./top_reviewers.py --repos <repo_a,repo_b,repo_c> <owner> <yyyy-mm-dd>
+./top_reviewers.py --repos <repo_a,repo_b,repo_c> <owner>
 ```
 Or to include a "since" date:
 ```sh
